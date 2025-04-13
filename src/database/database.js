@@ -1,5 +1,20 @@
 import * as SQLite from 'expo-sqlite';
 
+export const getWorkoutTemplates = async({setWorkoutTemplates}) => {
+
+   // Open or create the database
+   const db = await SQLite.openDatabaseAsync('trainer.db');
+
+   // Enable WAL mode for better performance
+   await db.execAsync('PRAGMA journal_mode = WAL');
+
+   // Run database operations within a transaction
+   await db.withTransactionAsync(async () => {
+    const results = await db.getAllAsync('SELECT * FROM workout_session_templates where is_active = true;');
+    setWorkoutTemplates(results);
+  });
+}
+
 export const setupDatabase = async ({setUser, setTestString}) => {
       // Open or create the database
       const db = await SQLite.openDatabaseAsync('trainer.db');
