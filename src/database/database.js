@@ -10,8 +10,18 @@ export const getWorkoutTemplates = async({setWorkoutTemplates}) => {
 
    // Run database operations within a transaction
    await db.withTransactionAsync(async () => {
-    const results = await db.getAllAsync('SELECT * FROM workout_session_templates where is_active = true;');
-    setWorkoutTemplates(results);
+    // get workout tempates
+    const workoutTemplates = await db.getAllAsync('SELECT * FROM workout_session_templates where is_active = true;');
+    // for each workout template get
+    for(let x = 0; x < workoutTemplates.length;x++){
+      const templateId = workoutTemplates[0].id;
+      const workoutsPerTemplate = await db.getAllAsync('SELECT wo.* FROM workouts as wo join workout_session_templates_to_workouts as wsttw on wo.id=wsttw.workout_id where workout_session_template_id = "' + templateId + '";');
+      workoutTemplates[x].workouts = workoutsPerTemplate;
+    }
+    console.log('workoutTemplates');
+    console.log(workoutTemplates[0]);
+
+    setWorkoutTemplates(workoutTemplates);
   });
 }
 

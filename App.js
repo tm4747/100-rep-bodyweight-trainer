@@ -2,7 +2,7 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomeScreen from './src/screens/HomeScreen';
-import StartWorkoutScreen from './src/screens/StartWorkoutScreen';
+import SelectWorkoutTemplate from './src/screens/SelectWorkoutTemplate';
 import PastResultsScreen from './src/screens/PastResultsScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
 import ActiveWorkoutScreen from './src/screens/ActiveWorkoutScreen';
@@ -20,7 +20,7 @@ export default function App() {
         />
         <Stack.Screen 
           name="SelectWorkoutTemplate" 
-          component={StartWorkoutScreen}
+          component={SelectWorkoutTemplate}
           options={{ title: 'Select Workout Template' }}
         />
         <Stack.Screen 

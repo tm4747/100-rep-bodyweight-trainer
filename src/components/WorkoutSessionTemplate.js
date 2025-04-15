@@ -1,15 +1,23 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Lis } from 'react-native';
 
 const WorkoutSessionTemplate = ({ template }) => {
+
+  const workoutsArray = template.workouts.length > 0 ? template.workouts : [];
+
+  const workouts = workoutsArray.map((workout) =>
+    <Text key={workout.id}>
+      {workout.name}
+    </Text>
+  );
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.templateName}>{template.name}</Text>
       </View>
       <View style={styles.content}>
-        {/* This will be expanded later to show more data */}
-        <Text style={styles.placeholder}>Additional data will be displayed here</Text>
+        {workouts}
       </View>
     </View>
   );
