@@ -1,23 +1,49 @@
 import React from 'react';
-import { View, Text, StyleSheet, Lis } from 'react-native';
+import { View, Text, StyleSheet, Button, Alert } from 'react-native';
+import MyCustomButton from './simple/button';
 
 const WorkoutSessionTemplate = ({ template }) => {
 
   const workoutsArray = template.workouts.length > 0 ? template.workouts : [];
 
-  const workouts = workoutsArray.map((workout) =>
-    <Text key={workout.id}>
-      {workout.name}
-    </Text>
-  );
+  const workouts = workoutsArray.map((workout) => (
+    <View key={workout.id} style={styles.workoutRow}>
+      <Text style={styles.workoutName}>{workout.name}</Text>
+      <Text style={styles.workoutGoal}>{workout.done}</Text>
+    </View>
+  ));
+
+  let b_existingWorkout = false;
+  for(let x = 0; x < workoutsArray.length; x++){
+    b_existingWorkout = workoutsArray[x].done > 0 ? true : b_existingWorkout;
+  }
+
+  const lastWorkoutTimestamp = b_existingWorkout ? (<View style={styles.workoutTimestamp}>
+    <Text>{template.workout_session.timestamp}</Text>
+  </View>) : (<View style={styles.workoutTimestamp}>
+    <Text>No workout data on record.</Text>
+  </View>);
+
+  const handlePress = () => {
+    Alert.alert('Button Pressed!', 'You tapped the button.');
+  };
+  
+  
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.templateName}>{template.name}</Text>
+        <MyCustomButton title={"click me"} onPress={handlePress} variation={1}/>
+        {/* <Button style={styles.actionButton} title="Click Me" onPress={handlePress} color="#007AFF" /> */}
       </View>
       <View style={styles.content}>
+      <View style={styles.workoutHeaderRow}>
+        <Text style={[styles.workoutName, styles.workoutHeaderText]}>WORKOUT</Text>
+        <Text style={[styles.workoutGoal, styles.workoutHeaderText]}>DONE LAST SESSION</Text>
+      </View>
         {workouts}
+        {lastWorkoutTimestamp}
       </View>
     </View>
   );
@@ -38,10 +64,18 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     padding: 15,
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
     backgroundColor: '#f8f8f8',
+  },
+  actionButton: {
+    paddingLeft: 50,
+    paddingRight:24,
+    backgroundColor:'black',
   },
   templateName: {
     fontSize: 18,
@@ -55,6 +89,35 @@ const styles = StyleSheet.create({
     color: '#666',
     fontStyle: 'italic',
   },
+  workoutRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  workoutName: {
+    fontSize: 16,
+    color: '#333',
+  },
+  workoutGoal: {
+    fontSize: 16,
+    color: '#888',
+  },
+  workoutHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
+    paddingBottom: 4,
+  },
+  
+workoutHeaderText: {
+  fontWeight: 'bold',
+},
+workoutTimestamp: {
+  flexDirection: 'row',
+  justifyContent: 'center',
+}  
 });
 
 export default WorkoutSessionTemplate; 

@@ -15,8 +15,23 @@ export const getWorkoutTemplates = async({setWorkoutTemplates}) => {
     // for each workout template get
     for(let x = 0; x < workoutTemplates.length;x++){
       const templateId = workoutTemplates[0].id;
-      const workoutsPerTemplate = await db.getAllAsync('SELECT wo.* FROM workouts as wo join workout_session_templates_to_workouts as wsttw on wo.id=wsttw.workout_id where workout_session_template_id = "' + templateId + '";');
-      workoutTemplates[x].workouts = workoutsPerTemplate;
+      
+      // get latest workout session 
+      const latestWorkoutsSession = await db.getFirstAsync('SELECT ws.* FROM workout_sessions as ws join workout_session_templates as wst on ws.workout_session_template_id=wst.id where wst.id  = "' + templateId + '" ORDER BY ws.timestamp DESC LIMIT 1;');
+      
+      workoutTemplates[x].latestWorkoutSession = latestWorkoutsSession;
+
+      // get workout session items for this workout session
+      const workoutSessionItems = latestWorkoutsSession ? await db.getAllAsync('\
+        SELECT wsi.*, w.* FROM workout_sessions as ws \
+        join workout_session_items as wsi on ws.id=wsi.workout_session_id \
+        join workouts as w on wsi.workout_id=w.id \
+        where ws.id = "' + latestWorkoutsSession.id + '";') : [];
+      console.log('workoutSessionItems');
+      console.log(workoutSessionItems);
+
+      workoutTemplates[x].workouts = workoutSessionItems;
+      // get last workout totals
     }
     console.log('workoutTemplates');
     console.log(workoutTemplates[0]);
@@ -82,22 +97,6 @@ export const setupDatabase = async ({setUser, setTestString}) => {
               ON DELETE CASCADE
           );`
         );
-        // WORKOUT SESSION TEMPLATES TO WORKOUTS table
-        await db.execAsync('DROP TABLE IF EXISTS workout_session_templates_to_workouts;'); 
-        await db.execAsync(
-            `CREATE TABLE IF NOT EXISTS workout_session_templates_to_workouts (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            workout_session_template_id INTEGER NOT NULL,
-            workout_id INTEGER NOT NULL,
-            FOREIGN KEY (workout_session_template_id) 
-              REFERENCES workout_session_templates(id)
-              ON DELETE CASCADE,
-            FOREIGN KEY (workout_id) 
-              REFERENCES workouts(id)
-              ON DELETE CASCADE,
-            UNIQUE(workout_session_template_id, workout_id)
-          );`
-        );
         // WORKOUT SESSION ITEMS table
         await db.execAsync('DROP TABLE IF EXISTS workout_session_items;'); 
         await db.execAsync(
@@ -137,10 +136,6 @@ export const setupDatabase = async ({setUser, setTestString}) => {
         const templateId = templateResult.lastInsertRowId;
         console.log('templateId');
         console.log(templateId);
-        // Insert workout session template to workouts
-        await db.runAsync('INSERT INTO workout_session_templates_to_workouts (workout_session_template_id, workout_id) VALUES (?, ?)', [templateId, 1]);
-        await db.runAsync('INSERT INTO workout_session_templates_to_workouts (workout_session_template_id, workout_id) VALUES (?, ?)', [templateId, 2]);
-        await db.runAsync('INSERT INTO workout_session_templates_to_workouts (workout_session_template_id, workout_id) VALUES (?, ?)', [templateId, 3]);
         // Insert workout session
         const yesterday = new Date();
         yesterday.setDate(yesterday.getDate() - 1);
@@ -152,9 +147,9 @@ export const setupDatabase = async ({setUser, setTestString}) => {
         console.log('sessionId');
         console.log(sessionId);
         // Insert workout session items
-        await db.runAsync('INSERT INTO workout_session_items (workout_session_id, workout_id, goal, done) VALUES (?, ?, ?, ?)', [sessionId, 1, null, 25]);
-        await db.runAsync('INSERT INTO workout_session_items (workout_session_id, workout_id, goal, done) VALUES (?, ?, ?, ?)', [sessionId, 2, null, 35]);
-        await db.runAsync('INSERT INTO workout_session_items (workout_session_id, workout_id, goal, done) VALUES (?, ?, ?, ?)', [sessionId, 3, null, 45]);
+        await db.runAsync('INSERT INTO workout_session_items (workout_session_id, workout_id, goal, done) VALUES (?, ?, ?, ?)', [sessionId, 1, null, 0]);
+        await db.runAsync('INSERT INTO workout_session_items (workout_session_id, workout_id, goal, done) VALUES (?, ?, ?, ?)', [sessionId, 2, null, 0]);
+        await db.runAsync('INSERT INTO workout_session_items (workout_session_id, workout_id, goal, done) VALUES (?, ?, ?, ?)', [sessionId, 3, null, 0]);
 
         // Retrieve the most recent user
         const result = await db.getFirstAsync('SELECT * FROM users ORDER BY id DESC LIMIT 1;');

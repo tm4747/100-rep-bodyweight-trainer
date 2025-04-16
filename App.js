@@ -8,7 +8,6 @@ import SettingsScreen from './src/screens/SettingsScreen';
 import ActiveWorkoutScreen from './src/screens/ActiveWorkoutScreen';
 
 const Stack = createNativeStackNavigator();
-
 export default function App() {
   return (
     <NavigationContainer>
