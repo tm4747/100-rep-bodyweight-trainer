@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import WorkoutSelector from '../components/WorkoutSelector';
 
-const SettingsScreen = ({ navigation }) => {
+const NewWorkoutTemplateScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Select Workouts</Text>
@@ -43,4 +43,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SettingsScreen; 
+export default NewWorkoutTemplateScreen; 

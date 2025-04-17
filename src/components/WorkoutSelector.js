@@ -108,7 +108,8 @@ const styles = StyleSheet.create({
     borderWidth:1,
     borderStyle:"solid",
     borderColor:"grey",
-    height:"60%",
+    height:"60px",
+    paddingBottom:"0%",
   },
   container: {
     flex:1,
