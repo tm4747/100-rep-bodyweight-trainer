@@ -34,8 +34,7 @@ const WorkoutSessionTemplate = ({ template }) => {
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.templateName}>{template.name}</Text>
-        <MyCustomButton title={"click me"} onPress={handlePress} variation={1}/>
-        {/* <Button style={styles.actionButton} title="Click Me" onPress={handlePress} color="#007AFF" /> */}
+        <MyCustomButton title={"Begin Workout"} onPress={handlePress} variation={1}/>
       </View>
       <View style={styles.content}>
       <View style={styles.workoutHeaderRow}>

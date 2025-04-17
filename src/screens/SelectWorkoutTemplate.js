@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, ScrollView, StyleSheet, Text } from 'react-native';
+import { TouchableOpacity, View, ScrollView, StyleSheet, Text } from 'react-native';
 import WorkoutSessionTemplate from '../components/WorkoutSessionTemplate';
 import { getWorkoutTemplates } from '../database/database';
 
@@ -41,6 +41,14 @@ const SelectWorkoutTemplate = ({ navigation }) => {
           <WorkoutSessionTemplate key={template.id} template={template} />
         ))}
       </ScrollView>
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigation.navigate('NewWorkoutTemplate')}
+        >
+          <Text style={styles.buttonText}>New Workout Template</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -59,6 +67,23 @@ const styles = StyleSheet.create({
   errorText: {
     color: 'red',
     textAlign: 'center',
+  },
+  buttonContainer: {
+    width: '100%',
+    alignItems: 'center',
+  },
+  button: {
+    backgroundColor: '#007AFF',
+    padding: 15,
+    borderRadius: 10,
+    marginVertical: 10,
+    width: '80%',
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
 });
 

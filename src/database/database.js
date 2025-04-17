@@ -1,5 +1,17 @@
 import * as SQLite from 'expo-sqlite';
 
+export const fetchWorkouts = async ({setWorkouts}) => {
+   const db = await SQLite.openDatabaseAsync('trainer.db');
+   await db.execAsync('PRAGMA journal_mode = WAL');
+    await db.withTransactionAsync(async () => {
+      // get workout tempates
+      const workouts = await db.getAllAsync(`SELECT * FROM workouts`);
+        console.log('workouts');
+        console.log(workouts);
+        setWorkouts(workouts);
+    });
+  };
+
 export const getWorkoutTemplates = async({setWorkoutTemplates}) => {
 
    // Open or create the database

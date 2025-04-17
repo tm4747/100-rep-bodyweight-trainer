@@ -6,6 +6,7 @@ import SelectWorkoutTemplate from './src/screens/SelectWorkoutTemplate';
 import PastResultsScreen from './src/screens/PastResultsScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
 import ActiveWorkoutScreen from './src/screens/ActiveWorkoutScreen';
+import NewWorkoutTemplateScreen from './src/screens/NewWorkoutTemplateScreen';
 
 const Stack = createNativeStackNavigator();
 export default function App() {
@@ -36,6 +37,11 @@ export default function App() {
           name="ActiveWorkout" 
           component={ActiveWorkoutScreen}
           options={{ title: 'Active Workout' }}
+        />
+      <Stack.Screen 
+          name="NewWorkoutTemplate" 
+          component={NewWorkoutTemplateScreen}
+          options={{ title: 'New Workout Template' }}
         />
       </Stack.Navigator>
     </NavigationContainer>
