@@ -24,6 +24,7 @@ const WorkoutSelector = () => {
     fetchWorkouts({setWorkouts});
   }, []);
 
+
   
 
   const toggleSelect = (id) => {
@@ -102,6 +103,10 @@ const WorkoutSelector = () => {
     </View>
   );
 };
+
+const NewWorkoutModal = () => {
+    <Text>Hey</Text>
+}
 
 const styles = StyleSheet.create({
   list: {
