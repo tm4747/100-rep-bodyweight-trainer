@@ -1,5 +1,10 @@
 import * as SQLite from 'expo-sqlite';
 
+const setupDB = async () => {
+  const db = await SQLite.openDatabaseAsync('trainer.db');
+  await db.execAsync('PRAGMA journal_mode = WAL');
+}
+
 export const fetchWorkouts = async ({setWorkouts}) => {
    const db = await SQLite.openDatabaseAsync('trainer.db');
    await db.execAsync('PRAGMA journal_mode = WAL');
@@ -11,6 +16,20 @@ export const fetchWorkouts = async ({setWorkouts}) => {
         setWorkouts(workouts);
     });
   };
+
+  export const insertNewWorkout = async (workoutName, workoutDescription) => {
+    const db = await SQLite.openDatabaseAsync('trainer.db');
+    await db.execAsync('PRAGMA journal_mode = WAL');
+     await db.withTransactionAsync(async () => {
+       // get workout tempates
+       await db.runAsync(
+        `INSERT INTO workouts (name, description) VALUES (?, ?)`,
+        workoutName,
+        workoutDescription
+      );
+     });
+   };
+
 
 export const getWorkoutTemplates = async({setWorkoutTemplates}) => {
 

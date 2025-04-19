@@ -10,14 +10,18 @@ import {
   Alert,
   Switch
 } from 'react-native';
-import { fetchWorkouts } from '../database/database';
-  
+//TODO: hereChunk 
+import { fetchWorkouts, insertNewWorkout } from '../database/database';
+import WorkoutModal from './WorkoutModal';  
+
 
 const WorkoutSelector = () => {
 
   const [workouts, setWorkouts] = useState([]);
   const [selectedIds, setSelectedIds] = useState([]);
+  const [newWorkoutTemplateName, setNewWorkoutTemplateName] = useState('');
   const [newWorkoutName, setNewWorkoutName] = useState('');
+  const [newWorkoutDescription, setNewWorkoutDescription] = useState('');
 
   // Load workouts on mount
   useEffect(() => {
@@ -25,25 +29,15 @@ const WorkoutSelector = () => {
   }, []);
 
 
-  
+const [modalVisible, setModalVisible] = useState(false);
 
-  const toggleSelect = (id) => {
-    setSelectedIds((prev) =>
-      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
-    );
-  };
-
-  const addWorkout = async () => {
-    if (!newWorkoutName.trim()) return;
-
-    try {
-      await db.runAsync(
-        `INSERT INTO workouts (name, description) VALUES (?, ?)`,
-        newWorkoutName.trim(),
-        ''
-      );
-      setNewWorkoutName('');
-      fetchWorkouts();
+const addWorkout = async (name, description) => {
+  if (!name.trim()) return;
+  try {
+    const workoutName = name.trim();
+    const workoutDescription = description.trim();
+    console.log("here: " + workoutName + " - " + workoutDescription);
+    await insertNewWorkout(workoutName, workoutDescription);
     } catch (err) {
       if (err.message.includes('UNIQUE')) {
         Alert.alert('Workout already exists');
@@ -51,6 +45,13 @@ const WorkoutSelector = () => {
         console.error('Error adding workout:', err);
       }
     }
+  await fetchWorkouts({setWorkouts});
+};
+
+  const toggleSelect = (id) => {
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+    );
   };
 
   const deleteWorkout = async (id) => {
@@ -84,22 +85,29 @@ const WorkoutSelector = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Select Workouts:</Text>
-      <FlatList
-        data={workouts}
-        renderItem={renderWorkoutItem}
-        keyExtractor={(item) => item.id.toString()}
-        style={styles.list}
-      />
-
-      <View style={styles.addRow}>
-        <TextInput
-          style={styles.input}
-          value={newWorkoutName}
-          onChangeText={setNewWorkoutName}
-          placeholder="New workout name"
+        <FlatList
+          data={workouts}
+          renderItem={renderWorkoutItem}
+          keyExtractor={(item) => item.id.toString()}
+          contentContainerStyle={styles.listContent}
         />
-        <Button title="Add" onPress={addWorkout} />
-      </View>
+        <View style={styles.addRow}>
+          <Text style={styles.title}>New Workout Template Name:</Text>
+        </View>
+        <View style={styles.addRow}>
+          <TextInput
+            style={styles.input}
+            value={newWorkoutTemplateName}
+            onChangeText={setNewWorkoutTemplateName}
+            placeholder="New workout template name"
+          />
+        </View>
+        <WorkoutModal
+          visible={modalVisible}
+          onClose={() => setModalVisible(false)}
+          onAddWorkout={addWorkout}
+        />
+        <Button title="New Workout" onPress={() => setModalVisible(true)} />
     </View>
   );
 };
@@ -109,12 +117,16 @@ const NewWorkoutModal = () => {
 }
 
 const styles = StyleSheet.create({
-  list: {
-    borderWidth:1,
+  listContent: {
+    borderWidth:2,
     borderStyle:"solid",
-    borderColor:"grey",
-    height:"60px",
-    paddingBottom:"0%",
+    borderColor:"lightgrey",
+    borderRadius:10,
+    paddingLeft:10,
+    paddingRight:20,
+  },
+  list:{
+
   },
   container: {
     flex:1,

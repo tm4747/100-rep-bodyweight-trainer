@@ -5,7 +5,6 @@ import WorkoutSelector from '../components/WorkoutSelector';
 const NewWorkoutTemplateScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Select Workouts</Text>
       <WorkoutSelector/>
       <TouchableOpacity
         style={styles.button}
