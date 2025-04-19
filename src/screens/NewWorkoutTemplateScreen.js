@@ -17,106 +17,94 @@ import WorkoutModal from '../components/WorkoutModal';
 const NewWorkoutTemplateScreen = ({ navigation }) => {
 
 
-const saveNewWorkoutTemplate = () => {
-  console.log("here");
+
+const [workouts, setWorkouts] = useState([]);
+const [selectedIds, setSelectedIds] = useState([]);
+const [newWorkoutTemplateName, setNewWorkoutTemplateName] = useState('');
+
+// Load workouts on mount
+useEffect(() => {
+  fetchWorkouts({setWorkouts});
+}, []);
+
+
+const saveNewWorkoutTemplate = async () => {
+  if(!newWorkoutTemplateName && selectedIds.length > 0)
+    return false;
+  await insertNewWorkoutTemplate(newWorkoutTemplateName, selectedIds);
+  navigation.navigate('SelectWorkoutTemplate')
 }
-
-  return (
-    <View style={styles.container}>
-      <WorkoutSelector/>
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => saveNewWorkoutTemplate()}
-      >
-        <Text style={styles.buttonText}>Save New Workout Template</Text>
-      </TouchableOpacity>
-    </View>
-  );
-};
-
-
-
-
-const WorkoutSelector = () => {
-
-  const [workouts, setWorkouts] = useState([]);
-  const [selectedIds, setSelectedIds] = useState([]);
-  const [newWorkoutTemplateName, setNewWorkoutTemplateName] = useState('');
-
-  // Load workouts on mount
-  useEffect(() => {
-    fetchWorkouts({setWorkouts});
-  }, []);
 
 
 const [modalVisible, setModalVisible] = useState(false);
 
 const addWorkout = async (name, description) => {
-  if (!name) return;
-  try {
-    console.log("here: " + name + " - " + description);
-    await insertNewWorkout(name, description);
-    } catch (err) {
-      if (err.message.includes('UNIQUE')) {
-        Alert.alert('Workout already exists');
-      } else {
-        console.error('Error adding workout:', err);
-      }
+if (!name) return;
+try {
+  console.log("here: " + name + " - " + description);
+  await insertNewWorkout(name, description);
+  } catch (err) {
+    if (err.message.includes('UNIQUE')) {
+      Alert.alert('Workout already exists');
+    } else {
+      console.error('Error adding workout:', err);
     }
+  }
+await fetchWorkouts({setWorkouts});
+};
+
+const toggleSelect = (id) => {
+  setSelectedIds((prev) =>
+    prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+  );
+};
+
+const confirmDeleteWorkout = (id) => {
+  Alert.alert(
+    "Confirm Delete",
+    "Are you sure you want to delete this workout?",
+    [
+      {
+        text: "Cancel",
+        style: "cancel"
+      },
+      { text: "OK", onPress: () => handleDeleteWorkout(id) }
+    ],
+    { cancelable: false }
+  );
+};
+
+const handleDeleteWorkout = async (id) => {
+  try {
+    await deleteWorkout(id);
+    setSelectedIds((prev) => prev.filter((i) => i !== id));
+  } catch (err) {
+    console.error('Error deleting workout:', err);
+  }
   await fetchWorkouts({setWorkouts});
 };
 
-  const toggleSelect = (id) => {
-    setSelectedIds((prev) =>
-      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
-    );
-  };
-
-  const confirmDeleteWorkout = (id) => {
-    Alert.alert(
-      "Confirm Delete",
-      "Are you sure you want to delete this workout?",
-      [
-        {
-          text: "Cancel",
-          style: "cancel"
-        },
-        { text: "OK", onPress: () => handleDeleteWorkout(id) }
-      ],
-      { cancelable: false }
-    );
-  };
-
-  const handleDeleteWorkout = async (id) => {
-    try {
-      await deleteWorkout(id);
-      setSelectedIds((prev) => prev.filter((i) => i !== id));
-    } catch (err) {
-      console.error('Error deleting workout:', err);
-    }
-    await fetchWorkouts({setWorkouts});
-  };
 
 
-
-  const renderWorkoutItem = ({ item }) => (
-    <View style={styles.itemRow}>
-        <Switch
-        value={selectedIds.includes(item.id)}
-        onValueChange={() => toggleSelect(item.id)}
-        trackColor={{ false: '#ccc', true: '#4cd964' }} // optional iOS green
-        thumbColor={selectedIds.includes(item.id) ? '#ffffff' : '#f4f3f4'}
-        style={styles.switch}
-        />
-      <Text style={styles.itemText}>{item.name}</Text>
-      <TouchableOpacity onPress={() => confirmDeleteWorkout(item.id)}>
-        <Text style={styles.deleteText}><FontAwesome name="close" size={24} color="red" /></Text>
-      </TouchableOpacity>
-    </View>
-  );
+const renderWorkoutItem = ({ item }) => (
+  <View style={styles.itemRow}>
+      <Switch
+      value={selectedIds.includes(item.id)}
+      onValueChange={() => toggleSelect(item.id)}
+      trackColor={{ false: '#ccc', true: '#4cd964' }} // optional iOS green
+      thumbColor={selectedIds.includes(item.id) ? '#ffffff' : '#f4f3f4'}
+      style={styles.switch}
+      />
+    <Text style={styles.itemText}>{item.name}</Text>
+    <TouchableOpacity onPress={() => confirmDeleteWorkout(item.id)}>
+      <Text style={styles.deleteText}><FontAwesome name="close" size={24} color="red" /></Text>
+    </TouchableOpacity>
+  </View>
+);
 
   return (
     <View style={styles.container}>
+      <View style={styles.container}>
       <Text>{newWorkoutTemplateName}</Text>
       <Text style={styles.title}>Select Workouts:</Text>
         <FlatList
@@ -152,8 +140,16 @@ const addWorkout = async (name, description) => {
         />
       
     </View>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => saveNewWorkoutTemplate()}
+      >
+        <Text style={styles.buttonText}>Save New Workout Template</Text>
+      </TouchableOpacity>
+    </View>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {

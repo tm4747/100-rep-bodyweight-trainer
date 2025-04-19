@@ -11,8 +11,8 @@ import {
   Switch
 } from 'react-native';
 //TODO: hereChunk 
-import { fetchWorkouts, insertNewWorkout, deleteWorkout, insertNewWorkoutTemplate } from '../database/database';
-import WorkoutModal from './WorkoutModal';  
+import { fetchWorkouts, insertNewWorkout, deleteWorkout, insertNewWorkoutTemplate } from '../../database/database';
+import WorkoutModal from '../WorkoutModal';  
 
 
 const WorkoutSelector = () => {
