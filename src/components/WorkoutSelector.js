@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-
 import {
   View,
   Text,
