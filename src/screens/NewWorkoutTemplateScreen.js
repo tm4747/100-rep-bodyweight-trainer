@@ -1,16 +1,22 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, useState } from 'react-native';
 import WorkoutSelector from '../components/WorkoutSelector';
 
 const NewWorkoutTemplateScreen = ({ navigation }) => {
+
+
+const saveNewWorkoutTemplate = () => {
+  console.log("here");
+}
+
   return (
     <View style={styles.container}>
       <WorkoutSelector/>
       <TouchableOpacity
         style={styles.button}
-        onPress={() => navigation.goBack()}
+        onPress={() => saveNewWorkoutTemplate()}
       >
-        <Text style={styles.buttonText}>Back to Home</Text>
+        <Text style={styles.buttonText}>Save New Workout Template</Text>
       </TouchableOpacity>
     </View>
   );

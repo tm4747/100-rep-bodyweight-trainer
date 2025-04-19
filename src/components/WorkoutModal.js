@@ -17,9 +17,7 @@ const WorkoutModal = ({ visible, onClose, onAddWorkout }) => {
 
   const handleAdd = async () => {
     if (!newWorkoutName.trim()) return;
-
     await onAddWorkout(newWorkoutName.trim(), newWorkoutDescription.trim());
-
     // Clear inputs and close modal
     setNewWorkoutName('');
     setNewWorkoutDescription('');

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+
 import {
   View,
   Text,
   TextInput,
-  Button,
   FlatList,
   TouchableOpacity,
   StyleSheet,
@@ -11,7 +12,7 @@ import {
   Switch
 } from 'react-native';
 //TODO: hereChunk 
-import { fetchWorkouts, insertNewWorkout } from '../database/database';
+import { fetchWorkouts, insertNewWorkout, deleteWorkout, insertNewWorkoutTemplate } from '../database/database';
 import WorkoutModal from './WorkoutModal';  
 
 
@@ -20,8 +21,6 @@ const WorkoutSelector = () => {
   const [workouts, setWorkouts] = useState([]);
   const [selectedIds, setSelectedIds] = useState([]);
   const [newWorkoutTemplateName, setNewWorkoutTemplateName] = useState('');
-  const [newWorkoutName, setNewWorkoutName] = useState('');
-  const [newWorkoutDescription, setNewWorkoutDescription] = useState('');
 
   // Load workouts on mount
   useEffect(() => {
@@ -32,12 +31,10 @@ const WorkoutSelector = () => {
 const [modalVisible, setModalVisible] = useState(false);
 
 const addWorkout = async (name, description) => {
-  if (!name.trim()) return;
+  if (!name) return;
   try {
-    const workoutName = name.trim();
-    const workoutDescription = description.trim();
-    console.log("here: " + workoutName + " - " + workoutDescription);
-    await insertNewWorkout(workoutName, workoutDescription);
+    console.log("here: " + name + " - " + description);
+    await insertNewWorkout(name, description);
     } catch (err) {
       if (err.message.includes('UNIQUE')) {
         Alert.alert('Workout already exists');
@@ -54,14 +51,29 @@ const addWorkout = async (name, description) => {
     );
   };
 
-  const deleteWorkout = async (id) => {
+  const confirmDeleteWorkout = (id) => {
+    Alert.alert(
+      "Confirm Delete",
+      "Are you sure you want to delete this workout?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel"
+        },
+        { text: "OK", onPress: () => handleDeleteWorkout(id) }
+      ],
+      { cancelable: false }
+    );
+  };
+
+  const handleDeleteWorkout = async (id) => {
     try {
-      await db.runAsync(`DELETE FROM workouts WHERE id = ?`, id);
+      await deleteWorkout(id);
       setSelectedIds((prev) => prev.filter((i) => i !== id));
-      fetchWorkouts();
     } catch (err) {
       console.error('Error deleting workout:', err);
     }
+    await fetchWorkouts({setWorkouts});
   };
 
 
@@ -76,14 +88,15 @@ const addWorkout = async (name, description) => {
         style={styles.switch}
         />
       <Text style={styles.itemText}>{item.name}</Text>
-      <TouchableOpacity onPress={() => deleteWorkout(item.id)}>
-        <Text style={styles.deleteText}>✕</Text>
+      <TouchableOpacity onPress={() => confirmDeleteWorkout(item.id)}>
+        <Text style={styles.deleteText}><FontAwesome name="close" size={24} color="red" /></Text>
       </TouchableOpacity>
     </View>
   );
 
   return (
     <View style={styles.container}>
+      <Text>{newWorkoutTemplateName}</Text>
       <Text style={styles.title}>Select Workouts:</Text>
         <FlatList
           data={workouts}
@@ -91,6 +104,15 @@ const addWorkout = async (name, description) => {
           keyExtractor={(item) => item.id.toString()}
           contentContainerStyle={styles.listContent}
         />
+        <View style={[styles.addRow, styles.centeredView]}>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => setModalVisible(true)}
+          >
+            <Text style={styles.buttonText}>+  New Workout</Text>
+          </TouchableOpacity>
+        </View>
+        
         <View style={styles.addRow}>
           <Text style={styles.title}>New Workout Template Name:</Text>
         </View>
@@ -107,7 +129,7 @@ const addWorkout = async (name, description) => {
           onClose={() => setModalVisible(false)}
           onAddWorkout={addWorkout}
         />
-        <Button title="New Workout" onPress={() => setModalVisible(true)} />
+      
     </View>
   );
 };
@@ -117,6 +139,27 @@ const NewWorkoutModal = () => {
 }
 
 const styles = StyleSheet.create({
+  centeredView:{
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 10,
+    paddingBottom:20,
+    borderBottomStyle:"solid",
+    borderBottomColor:"lightgrey",
+    borderBottomWidth:1,
+  },
+  button: {
+    backgroundColor: '#007AFF',
+    padding: 7.5,
+    borderRadius: 10,
+    width: '75%',
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
   listContent: {
     borderWidth:2,
     borderStyle:"solid",
@@ -169,5 +212,6 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     marginRight: 10,
   },
+ 
 });
 export default WorkoutSelector; 

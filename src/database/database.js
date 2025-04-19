@@ -21,12 +21,48 @@ export const fetchWorkouts = async ({setWorkouts}) => {
     const db = await SQLite.openDatabaseAsync('trainer.db');
     await db.execAsync('PRAGMA journal_mode = WAL');
      await db.withTransactionAsync(async () => {
-       // get workout tempates
        await db.runAsync(
         `INSERT INTO workouts (name, description) VALUES (?, ?)`,
         workoutName,
         workoutDescription
       );
+     });
+   };
+
+
+  export const insertNewWorkoutTemplate = async (workoutTemplateName, workoutIds) => {
+    const db = await SQLite.openDatabaseAsync('trainer.db');
+    await db.execAsync('PRAGMA journal_mode = WAL');
+     await db.withTransactionAsync(async () => {
+       // insert new workout template and get id
+       const templateResult = await db.runAsync(
+        `INSERT INTO workout_session_templates (name) VALUES (?)`,
+        workoutTemplateName
+      );
+      const templateId = templateResult.lastInsertRowId;
+      // insert new workout session and get id with workout_session_template_id, timestamp: now, duration: null. 
+      const workoutSessionResult = await db.runAsync(
+        `INSERT INTO workout_sessions (workout_session_template_id) VALUES (?)`,
+        templateId
+      );
+      const workoutSessionId = workoutSessionResult.lastInsertRowId;
+      // insert workout session items for each workoutId - workout_session_id, workout_id, goal=0, done=0
+      for(var x=0;x<workoutIds.length; x++){
+        await db.runAsync(
+          `INSERT INTO workout_session_items (workout_session_id, workout_id) VALUES (?, ?)`,
+          workoutSessionId,
+          workoutIds[x]
+        );
+      }
+     });
+   };
+
+
+  export const deleteWorkout = async (id) => {
+    const db = await SQLite.openDatabaseAsync('trainer.db');
+    await db.execAsync('PRAGMA journal_mode = WAL');
+     await db.withTransactionAsync(async () => {
+       await db.runAsync(`DELETE FROM workouts WHERE id = ?`, id);
      });
    };
 
@@ -121,8 +157,8 @@ export const setupDatabase = async ({setUser, setTestString}) => {
             `CREATE TABLE IF NOT EXISTS workout_sessions (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             workout_session_template_id INTEGER NOT NULL,
-            timestamp DATETIME NOT NULL,
-            duration INTEGER NOT NULL,
+            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+            duration INTEGER DEFAULT 0,
             FOREIGN KEY (workout_session_template_id) 
               REFERENCES workout_session_templates(id)
               ON DELETE CASCADE
@@ -135,8 +171,8 @@ export const setupDatabase = async ({setUser, setTestString}) => {
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             workout_session_id INTEGER NOT NULL,
             workout_id INTEGER NOT NULL,
-            goal INTEGER,
-            done INTEGER NOT NULL,
+            goal INTEGER DEFAULT 0,
+            done INTEGER DEFAULT 0,
             FOREIGN KEY (workout_session_id) 
               REFERENCES workout_sessions(id)
               ON DELETE CASCADE,
