@@ -133,9 +133,7 @@ const addWorkout = async (name, description) => {
   );
 };
 
-const NewWorkoutModal = () => {
-    <Text>Hey</Text>
-}
+
 
 const styles = StyleSheet.create({
   centeredView:{
