@@ -17,6 +17,19 @@ export const fetchWorkouts = async ({setWorkouts}) => {
     });
   };
 
+
+export const fetchWorkoutSessions = async ({setWorkoutSessions}) => {
+  const db = await SQLite.openDatabaseAsync('trainer.db');
+  await db.execAsync('PRAGMA journal_mode = WAL');
+   await db.withTransactionAsync(async () => {
+     // get workout tempates
+     const workoutSessions = await db.getAllAsync(`SELECT * FROM workout_sessions`);
+       console.log('workouts');
+       console.log(workoutSessions);
+       setWorkoutSessions(workoutSessions);
+   });
+ };
+
   export const insertNewWorkout = async (workoutName, workoutDescription) => {
     const db = await SQLite.openDatabaseAsync('trainer.db');
     await db.execAsync('PRAGMA journal_mode = WAL');
@@ -68,32 +81,36 @@ export const fetchWorkouts = async ({setWorkouts}) => {
 
 
 export const getWorkoutTemplates = async({setWorkoutTemplates}) => {
-
-   // Open or create the database
    const db = await SQLite.openDatabaseAsync('trainer.db');
-
-   // Enable WAL mode for better performance
    await db.execAsync('PRAGMA journal_mode = WAL');
 
    // Run database operations within a transaction
    await db.withTransactionAsync(async () => {
     // get workout tempates
     const workoutTemplates = await db.getAllAsync('SELECT * FROM workout_session_templates where is_active = true;');
-    // for each workout template get
+    console.log('initial workoutTemplates');
+    console.log(workoutTemplates);
+    // loop through each workout template and pull latest workout_session, and then workout_session_items for that workout_session
     for(let x = 0; x < workoutTemplates.length;x++){
-      const templateId = workoutTemplates[0].id;
+      const templateId = workoutTemplates[x].id;
+
+      console.log("this workout template ID: " + templateId);
       
       // get latest workout session 
-      const latestWorkoutsSession = await db.getFirstAsync('SELECT ws.* FROM workout_sessions as ws join workout_session_templates as wst on ws.workout_session_template_id=wst.id where wst.id  = "' + templateId + '" ORDER BY ws.timestamp DESC LIMIT 1;');
+      const latestWorkoutsSession = await db.getFirstAsync(
+        'SELECT * from workout_sessions where workout_session_template_id  = "' + templateId + '" \
+        ORDER BY timestamp DESC LIMIT 1;');
       
+        console.log('latestWorkoutsSession');
+        console.log(latestWorkoutsSession);
       workoutTemplates[x].latestWorkoutSession = latestWorkoutsSession;
+      const workoutSessionId = latestWorkoutsSession.id;
 
       // get workout session items for this workout session
       const workoutSessionItems = latestWorkoutsSession ? await db.getAllAsync('\
-        SELECT wsi.*, w.* FROM workout_sessions as ws \
-        join workout_session_items as wsi on ws.id=wsi.workout_session_id \
+        SELECT wsi.*, w.* FROM workout_session_items as wsi \
         join workouts as w on wsi.workout_id=w.id \
-        where ws.id = "' + latestWorkoutsSession.id + '";') : [];
+        where wsi.workout_session_id = "' + workoutSessionId + '";') : [];
       console.log('workoutSessionItems');
       console.log(workoutSessionItems);
 
@@ -101,7 +118,7 @@ export const getWorkoutTemplates = async({setWorkoutTemplates}) => {
       // get last workout totals
     }
     console.log('workoutTemplates');
-    console.log(workoutTemplates[0]);
+    console.log(workoutTemplates[x]);
 
     setWorkoutTemplates(workoutTemplates);
   });
