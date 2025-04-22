@@ -6,10 +6,9 @@ import { setupDatabase } from '../database/database';
 const HomeScreen = ({ navigation }) => {
 
   const [user, setUser] = useState(null);
-  const [testString, setTestString] = useState(null);
   
     useEffect(() => {
-          setupDatabase({setUser, setTestString});
+          setupDatabase({setUser});
     }, []);
 
 
@@ -20,11 +19,6 @@ const HomeScreen = ({ navigation }) => {
           <Text style={styles.text}>Latest User: {user.name}</Text>
         ) : (
           <Text style={styles.text}>Loading User...</Text>
-        )}
-        {testString ? (
-          <Text style={styles.text}>Latest testString: {testString}</Text>
-        ) : (
-          <Text style={styles.text}>Loading testString...</Text>
         )}
       <Text style={styles.title}>100 Rep Bodyweight Trainer</Text>
       <View style={styles.buttonContainer}>

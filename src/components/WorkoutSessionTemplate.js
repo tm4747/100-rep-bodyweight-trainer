@@ -4,7 +4,7 @@ import MyCustomButton from './simple/button';
 
 const WorkoutSessionTemplate = ({ template }) => {
 
-  const workoutsArray = template.workouts.length > 0 ? template.workouts : [];
+  const workoutsArray = template.workoutSessionItems.length > 0 ? template.workoutSessionItems : [];
 
   const workouts = workoutsArray.map((workout) => (
     <View key={workout.id} style={styles.workoutRow}>

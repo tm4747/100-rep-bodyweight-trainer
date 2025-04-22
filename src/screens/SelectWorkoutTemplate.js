@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { TouchableOpacity, View, ScrollView, StyleSheet, Text } from 'react-native';
 import WorkoutSessionTemplate from '../components/WorkoutSessionTemplate';
-import { getWorkoutTemplates, fetchWorkoutSessions } from '../database/database';
+import { getWorkoutTemplates } from '../database/database';
 
 
 const SelectWorkoutTemplate = ({ navigation }) => {
-  const [workoutSessions, setWorkoutSessions] = useState([]);
   const [templates, setWorkoutTemplates] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -20,15 +19,6 @@ const SelectWorkoutTemplate = ({ navigation }) => {
     }
   }, []);
 
-  useEffect(() => {
-    try{
-      fetchWorkoutSessions({setWorkoutSessions});
-      console.log('workoutSessions');
-      console.log(workoutSessions);
-    } catch {
-      setError(true);
-    }
-  }, []);
 
   if (isLoading) {
     return (

@@ -41,7 +41,6 @@ const [modalVisible, setModalVisible] = useState(false);
 const addWorkout = async (name, description) => {
 if (!name) return;
 try {
-  console.log("here: " + name + " - " + description);
   await insertNewWorkout(name, description);
   } catch (err) {
     if (err.message.includes('UNIQUE')) {

@@ -11,8 +11,6 @@ export const fetchWorkouts = async ({setWorkouts}) => {
     await db.withTransactionAsync(async () => {
       // get workout tempates
       const workouts = await db.getAllAsync(`SELECT * FROM workouts`);
-        console.log('workouts');
-        console.log(workouts);
         setWorkouts(workouts);
     });
   };
@@ -24,8 +22,6 @@ export const fetchWorkoutSessions = async ({setWorkoutSessions}) => {
    await db.withTransactionAsync(async () => {
      // get workout tempates
      const workoutSessions = await db.getAllAsync(`SELECT * FROM workout_sessions`);
-       console.log('workouts');
-       console.log(workoutSessions);
        setWorkoutSessions(workoutSessions);
    });
  };
@@ -96,7 +92,7 @@ export const getWorkoutTemplates = async({setWorkoutTemplates}) => {
 
       console.log("this workout template ID: " + templateId);
       
-      // get latest workout session 
+      // get latest workout session for this template
       const latestWorkoutsSession = await db.getFirstAsync(
         'SELECT * from workout_sessions where workout_session_template_id  = "' + templateId + '" \
         ORDER BY timestamp DESC LIMIT 1;');
@@ -114,11 +110,11 @@ export const getWorkoutTemplates = async({setWorkoutTemplates}) => {
       console.log('workoutSessionItems');
       console.log(workoutSessionItems);
 
-      workoutTemplates[x].workouts = workoutSessionItems;
+      workoutTemplates[x].workoutSessionItems = workoutSessionItems;
       // get last workout totals
     }
-    console.log('workoutTemplates');
-    console.log(workoutTemplates[x]);
+    console.log('all workoutTemplates');
+    console.log(workoutTemplates);
 
     setWorkoutTemplates(workoutTemplates);
   });
@@ -218,18 +214,12 @@ export const setupDatabase = async ({setUser, setTestString}) => {
         //Insert workout session template
         const templateResult = await db.runAsync('INSERT INTO workout_session_templates (name, is_active) VALUES (?, ?)', ['test workout', 1]);
         const templateId = templateResult.lastInsertRowId;
-        console.log('templateId');
-        console.log(templateId);
         // Insert workout session
         const yesterday = new Date();
         yesterday.setDate(yesterday.getDate() - 1);
         yesterday.setHours(13, 0, 0, 0); // 1 PM UTC
         const sessionResult = await db.runAsync('INSERT INTO workout_sessions (workout_session_template_id, timestamp, duration) VALUES (?, ?, ?)', [templateId, yesterday.toISOString(), 320]);
-        console.log('sessionResult');
-        console.log(sessionResult);
         const sessionId = sessionResult.lastInsertRowId;
-        console.log('sessionId');
-        console.log(sessionId);
         // Insert workout session items
         await db.runAsync('INSERT INTO workout_session_items (workout_session_id, workout_id, goal, done) VALUES (?, ?, ?, ?)', [sessionId, 1, null, 0]);
         await db.runAsync('INSERT INTO workout_session_items (workout_session_id, workout_id, goal, done) VALUES (?, ?, ?, ?)', [sessionId, 2, null, 0]);
@@ -238,9 +228,5 @@ export const setupDatabase = async ({setUser, setTestString}) => {
         // Retrieve the most recent user
         const result = await db.getFirstAsync('SELECT * FROM users ORDER BY id DESC LIMIT 1;');
         setUser(result);
-        const testString = await db.getFirstAsync('SELECT done FROM workout_session_items ORDER BY id DESC LIMIT 1;');
-        console.log('testString');
-        console.log(testString);
-        setTestString(testString.done)
       });
     };
