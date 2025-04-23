@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useCallback } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import { TouchableOpacity, View, ScrollView, StyleSheet, Text } from 'react-native';
 import WorkoutSessionTemplate from '../components/WorkoutSessionTemplate';
 import { getWorkoutTemplates } from '../database/database';
@@ -8,16 +9,26 @@ const SelectWorkoutTemplate = ({ navigation }) => {
   const [templates, setWorkoutTemplates] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [workoutTemplateCount, setWorkoutTemplateCount] = useState(0);
 
 
-  useEffect(() => {
-    try{
-      getWorkoutTemplates({setWorkoutTemplates});
-      setIsLoading(false);
-    } catch {
-      setError(true);
-    }
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      try{
+        getWorkoutTemplates({setWorkoutTemplates});
+        setIsLoading(false);
+      } catch {
+        setError(true);
+      }
+    }, [])
+  );
+
+
+  useFocusEffect(
+    useCallback(() => {
+      setWorkoutTemplateCount(templates.length)
+    }, [templates])
+  );
 
 
   if (isLoading) {
@@ -35,6 +46,16 @@ const SelectWorkoutTemplate = ({ navigation }) => {
       </View>
     );
   }
+  let buttonFunction, buttonText, buttonStyles;
+  if(workoutTemplateCount < 3){
+    buttonText = "Create New Workout Template";
+    buttonFunction = () => navigation.navigate('NewWorkoutTemplate');
+    buttonStyles = styles.button;
+  } else {
+    buttonText = "Workout Template Limit Reached";
+    buttonFunction = () => console.log('too many tempalates');
+    buttonStyles = [styles.button, styles.buttonDisabled];
+  }
 
   return (
     <View style={styles.container}>
@@ -45,10 +66,10 @@ const SelectWorkoutTemplate = ({ navigation }) => {
       </ScrollView>
       <View style={styles.buttonContainer}>
         <TouchableOpacity
-          style={styles.button}
-          onPress={() => navigation.navigate('NewWorkoutTemplate')}
+          style={buttonStyles}
+          onPress={buttonFunction}
         >
-          <Text style={styles.buttonText}>New Workout Template</Text>
+          <Text style={styles.buttonText}>{buttonText}</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -87,6 +108,9 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
   },
+  buttonDisabled: {
+    backgroundColor: 'darkred',
+  }
 });
 
 export default SelectWorkoutTemplate; 

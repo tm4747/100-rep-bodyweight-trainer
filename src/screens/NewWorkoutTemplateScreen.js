@@ -16,8 +16,6 @@ import WorkoutModal from '../components/WorkoutModal';
 
 const NewWorkoutTemplateScreen = ({ navigation }) => {
 
-
-
 const [workouts, setWorkouts] = useState([]);
 const [selectedIds, setSelectedIds] = useState([]);
 const [newWorkoutTemplateName, setNewWorkoutTemplateName] = useState('');
@@ -29,10 +27,16 @@ useEffect(() => {
 
 
 const saveNewWorkoutTemplate = async () => {
-  if(!newWorkoutTemplateName && selectedIds.length > 0)
+  if(!newWorkoutTemplateName || selectedIds.length <= 0){
+    console.log("no name or there's no selected workouts");
     return false;
+  } else {
+    console.log("have name: " + newWorkoutTemplateName);
+  }
+  console.log(selectedIds);
+
   await insertNewWorkoutTemplate(newWorkoutTemplateName, selectedIds);
-  navigation.navigate('SelectWorkoutTemplate')
+  navigation.goBack();
 }
 
 
