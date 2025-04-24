@@ -108,7 +108,6 @@ const renderWorkoutItem = ({ item }) => (
   return (
     <View style={styles.container}>
       <View style={styles.container}>
-      <Text>{newWorkoutTemplateName}</Text>
       <Text style={styles.title}>Select Workouts:</Text>
         <FlatList
           data={workouts}
@@ -116,7 +115,7 @@ const renderWorkoutItem = ({ item }) => (
           keyExtractor={(item) => item.id.toString()}
           contentContainerStyle={styles.listContent}
         />
-        <View style={[styles.addRow, styles.centeredView]}>
+        <View style={[styles.addRow, styles.centeredView, styles.borderBottomView]}>
           <TouchableOpacity
             style={styles.button}
             onPress={() => setModalVisible(true)}
@@ -125,10 +124,10 @@ const renderWorkoutItem = ({ item }) => (
           </TouchableOpacity>
         </View>
         
-        <View style={styles.addRow}>
+        <View style={[styles.centeredView]}>
           <Text style={styles.title}>New Workout Template Name:</Text>
         </View>
-        <View style={styles.addRow}>
+        <View style={[styles.flexRow, styles.centeredView, styles.borderBottomView]}>
           <TextInput
             style={styles.input}
             value={newWorkoutTemplateName}
@@ -136,6 +135,7 @@ const renderWorkoutItem = ({ item }) => (
             placeholder="New workout template name"
           />
         </View>
+        
         <WorkoutModal
           visible={modalVisible}
           onClose={() => setModalVisible(false)}
@@ -143,12 +143,14 @@ const renderWorkoutItem = ({ item }) => (
         />
       
     </View>
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => saveNewWorkoutTemplate()}
-      >
-        <Text style={styles.buttonText}>Save New Workout Template</Text>
-      </TouchableOpacity>
+    <View style={[styles.centeredView]}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => saveNewWorkoutTemplate()}
+        >
+          <Text style={styles.buttonText}>Save New Workout Template</Text>
+        </TouchableOpacity>
+        </View>
     </View>
   );
 };
@@ -170,7 +172,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#007AFF',
     padding: 15,
     borderRadius: 10,
-    width: '80%',
+    width: '100%',
     alignItems: 'center',
   },
   buttonText: {
@@ -182,6 +184,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 10,
+  },
+  borderBottomView: {
     paddingBottom:20,
     borderBottomStyle:"solid",
     borderBottomColor:"lightgrey",
@@ -191,7 +195,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#007AFF',
     padding: 7.5,
     borderRadius: 10,
-    width: '75%',
+    width: '100%',
     alignItems: 'center',
   },
   buttonText: {
@@ -206,9 +210,6 @@ const styles = StyleSheet.create({
     borderRadius:10,
     paddingLeft:10,
     paddingRight:20,
-  },
-  list:{
-
   },
   container: {
     flex:1,
@@ -237,10 +238,11 @@ const styles = StyleSheet.create({
     color: '#ff3b30',
     marginLeft: 10,
   },
-  addRow: {
+  flexRow:{
     flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 15,
+  },
+  addRow: {
+    paddingTop:25,
   },
   input: {
     flex: 1,

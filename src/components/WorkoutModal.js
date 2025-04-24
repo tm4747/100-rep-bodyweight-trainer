@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
 import {
   Modal,
   View,
@@ -14,6 +15,7 @@ import {
 const WorkoutModal = ({ visible, onClose, onAddWorkout }) => {
   const [newWorkoutName, setNewWorkoutName] = useState('');
   const [newWorkoutDescription, setNewWorkoutDescription] = useState('');
+  const [b_submitWorkoutDisabled, setSubmitWorkoutDisabled] = useState(true);
 
   const handleAdd = async () => {
     if (!newWorkoutName.trim()) return;
@@ -23,6 +25,11 @@ const WorkoutModal = ({ visible, onClose, onAddWorkout }) => {
     setNewWorkoutDescription('');
     onClose();
   };
+
+    useEffect(() => {
+      setSubmitWorkoutDisabled(!newWorkoutName.trim());
+    }, [newWorkoutName]);
+
 
   return (
     <Modal
@@ -39,8 +46,8 @@ const WorkoutModal = ({ visible, onClose, onAddWorkout }) => {
 
           <View style={styles.modalContent}>
             {/* Close Button */}
-            <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-              <Text style={styles.closeButtonText}>×</Text>
+            <TouchableOpacity onPress={onClose}>
+              <Text style={styles.deleteText}><FontAwesome name="close" size={24} color="#333" /></Text>
             </TouchableOpacity>
 
             {/* Input Fields */}
@@ -61,11 +68,9 @@ const WorkoutModal = ({ visible, onClose, onAddWorkout }) => {
             />
 
             {/* Add Button */}
-            <Button
-              title="Add Workout"
-              onPress={handleAdd}
-              disabled={!newWorkoutName.trim()}
-            />
+            <TouchableOpacity style={b_submitWorkoutDisabled ? [styles.button, styles.buttonDisabled] : styles.button} onPress={handleAdd} disabled={b_submitWorkoutDisabled}>
+              <Text style={styles.buttonText}>Add Workout {b_submitWorkoutDisabled}</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </TouchableWithoutFeedback>
@@ -111,6 +116,27 @@ const styles = StyleSheet.create({
     height: 100,
     textAlignVertical: 'top',
   },
+  deleteText: {
+    textAlign: "right",
+    fontSize: 18,
+    marginRight: 10,
+    marginBottom:10,
+  },
+  button: {
+    backgroundColor: '#007AFF',
+    padding: 15,
+    borderRadius: 10,
+    width: '100%',
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  buttonDisabled: {
+    backgroundColor: "#667",
+  }
 });
 
 export default WorkoutModal;
