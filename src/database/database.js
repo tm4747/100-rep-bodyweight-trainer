@@ -200,16 +200,14 @@ export const setupDatabase = async ({setUser, setTestString}) => {
         await db.runAsync('INSERT INTO users (name) VALUES (?);', ['Margo the hun']);
         // Insert workouts
         const workouts = [
-          { name: 'Push-Ups' },
-          { name: 'Pull-Ups' },
-          { name: 'Sit-Ups' },
-          { name: 'Bodyweight Squats' },
-          { name: 'Burpees' },
-          { name: 'Squat-Jumps' },
-          { name: 'Lunges' }
+          { name: 'Push-Ups', description: 'Assume plank position with a rigid back.  Lower yourself all the way to the ground by bending your elbows.  Push yourself all the way up until your elbows are straight.' },
+          { name: 'Pull-Ups', description: 'Jump up and grab a bar, tree branch or whatever hanging object you can find.  Pull yourself up so your chin is above the bar. Lower yourself back down 3/4 of the way.' },
+          { name: 'Sit-Ups', description: 'Laying down on your back, contract your abdomen muscles to lift your upper torso off the floor, touching your elbow to your knees and then lower yourself back down.' },
+          { name: 'Bodyweight Squats', description: 'Extending your arms straight forward, turn your feet out about 30 degrees, a little wider than shoulder width apart.  Keeping your back straight, bring your hips back and sink into a deep squat position, then push yourself back up.' },
+          { name: 'Burpees', description: 'Squat, planting your hands on the ground in front of you.  Kick your feet back into push-up position.  Jump your feet forward back between your hand, into a squatting position.  Finally Jump up in the air and land standing up.' },
         ];
         for(var x = 0; x < workouts.length; x++){
-          await db.runAsync('INSERT INTO workouts (name) VALUES (?);', [workouts[x].name]);
+          await db.runAsync('INSERT INTO workouts (name, description) VALUES (?, ?);', [workouts[x].name, workouts[x].description]);
         }
         //Insert workout session template
         const templateResult = await db.runAsync('INSERT INTO workout_session_templates (name, is_active) VALUES (?, ?)', ['test workout', 1]);

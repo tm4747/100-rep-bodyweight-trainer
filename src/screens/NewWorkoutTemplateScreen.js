@@ -13,12 +13,31 @@ import {
 //TODO: hereChunk 
 import { fetchWorkouts, insertNewWorkout, deleteWorkout, insertNewWorkoutTemplate } from '../database/database';
 import WorkoutModal from '../components/WorkoutModal';  
+import MessageModal from '../components/MessageModal';
 
 const NewWorkoutTemplateScreen = ({ navigation }) => {
+
 
 const [workouts, setWorkouts] = useState([]);
 const [selectedIds, setSelectedIds] = useState([]);
 const [newWorkoutTemplateName, setNewWorkoutTemplateName] = useState('');
+const [messageModalVisible, setMessageModalVisible] = useState(false);
+const [modalMessage, setModalMessage] = useState('');
+const [modalTitle, setModalTitle] = useState('');
+
+
+const showModal = (title, msg) => {
+  setModalTitle(title);
+  setModalMessage(msg);
+  setMessageModalVisible(true);
+};
+
+const messageModal = <MessageModal
+visible={messageModalVisible}
+message={modalMessage}
+title={modalTitle}
+onClose={() => { setModalMessage(""); setModalTitle(""); setMessageModalVisible(false); }}
+/>
 
 // Load workouts on mount
 useEffect(() => {
@@ -99,6 +118,9 @@ const renderWorkoutItem = ({ item }) => (
       style={styles.switch}
       />
     <Text style={styles.itemText}>{item.name}</Text>
+    <Text style={styles.itemText} onPress={() => showModal(item.name, item.description)}>
+      <FontAwesome name="question-circle" size={22} color="midnightblue" />
+    </Text>
     <TouchableOpacity onPress={() => confirmDeleteWorkout(item.id)}>
       <Text style={styles.deleteText}><FontAwesome name="close" size={24} color="red" /></Text>
     </TouchableOpacity>
@@ -141,7 +163,7 @@ const renderWorkoutItem = ({ item }) => (
           onClose={() => setModalVisible(false)}
           onAddWorkout={addWorkout}
         />
-      
+       {messageModal}
     </View>
     <View style={[styles.centeredView]}>
         <TouchableOpacity
