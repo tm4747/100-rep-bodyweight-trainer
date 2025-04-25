@@ -122,7 +122,7 @@ const renderWorkoutItem = ({ item }) => (
       <FontAwesome name="question-circle" size={22} color="midnightblue" />
     </Text>
     <TouchableOpacity onPress={() => confirmDeleteWorkout(item.id)}>
-      <Text style={styles.deleteText}><FontAwesome name="close" size={24} color="red" /></Text>
+      <Text style={styles.closeTextElement}><FontAwesome name="close" size={24} color="red" /></Text>
     </TouchableOpacity>
   </View>
 );
@@ -255,7 +255,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
   },
-  deleteText: {
+  closeTextElement: {
     fontSize: 18,
     color: '#ff3b30',
     marginLeft: 10,

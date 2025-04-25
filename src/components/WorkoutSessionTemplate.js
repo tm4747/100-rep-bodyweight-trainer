@@ -1,6 +1,9 @@
 import React from 'react';
-import { View, Text, StyleSheet, Button, Alert } from 'react-native';
+import { View, Text, StyleSheet, Button, Alert, TouchableOpacity } from 'react-native';
 import MyCustomButton from './simple/button';
+import { readable_timestamp } from '../../lib/CalculationHelper';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+
 
 const WorkoutSessionTemplate = ({ template }) => {
 
@@ -18,23 +21,51 @@ const WorkoutSessionTemplate = ({ template }) => {
     b_existingWorkout = workoutsArray[x].done > 0 ? true : b_existingWorkout;
   }
 
-  const lastWorkoutTimestamp = b_existingWorkout ? (<View style={styles.workoutTimestamp}>
-    <Text>{template.workout_session.timestamp}</Text>
-  </View>) : (<View style={styles.workoutTimestamp}>
-    <Text>No workout data on record.</Text>
-  </View>);
+  const workoutSessionTimestamp = (b_existingWorkout && template.latestWorkoutSession?.timestamp) ? "Last Workout: " + readable_timestamp(template.latestWorkoutSession.timestamp) : "No Workout Session On Record";
+
+  const lastWorkoutTimestamp = <View style={styles.workoutTimestamp}>
+    <Text style={styles.lastWorkout}>{workoutSessionTimestamp}</Text>
+  </View>;
 
   const handlePress = () => {
     Alert.alert('Button Pressed!', 'You tapped the button.');
   };
   
+
+  const confirmDeleteWorkoutTemplate = (id) => {
+    Alert.alert(
+      "Confirm Delete",
+      "Are you sure you want to delete this workout?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel"
+        },
+        { text: "OK", onPress: () => handleDeleteWorkoutTemplate(id) }
+      ],
+      { cancelable: false }
+    );
+  };
+
+  const handleDeleteWorkoutTemplate = async (id) => {
+    try {
+      await deleteWorkoutTemplate(id);
+      // HERE
+      setSelectedIds((prev) => prev.filter((i) => i !== id));
+    } catch (err) {
+      console.error('Error deleting workout:', err);
+    }
+    await fetchWorkouts({setWorkouts});
+  };
   
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.templateName}>{template.name}</Text>
-        <MyCustomButton title={"Begin Workout"} onPress={handlePress} variation={1}/>
+        <TouchableOpacity onPress={() => confirmDeleteWorkoutTemplate(template.id)}>
+          <Text style={styles.closeTextElement}><FontAwesome name="close" size={24} color="red" /></Text>
+        </TouchableOpacity>
       </View>
       <View style={styles.content}>
       <View style={styles.workoutHeaderRow}>
@@ -43,6 +74,7 @@ const WorkoutSessionTemplate = ({ template }) => {
       </View>
         {workouts}
         {lastWorkoutTimestamp}
+        <MyCustomButton title={"Begin Workout"} onPress={handlePress} variation={1}/>
       </View>
     </View>
   );
@@ -116,7 +148,16 @@ workoutHeaderText: {
 workoutTimestamp: {
   flexDirection: 'row',
   justifyContent: 'center',
-}  
+},
+lastWorkout: {
+  padding:10,
+  fontWeight: "bold",
+},
+closeTextElement: {
+  fontSize: 18,
+  color: '#ff3b30',
+  marginLeft: 10,
+},
 });
 
 export default WorkoutSessionTemplate; 
