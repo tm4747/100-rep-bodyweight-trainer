@@ -106,7 +106,7 @@ export const fetchWorkoutSessions = async ({setWorkoutSessions}) => {
     // IF - Is legit workout session -> simply set workout_session_template.id to inactive
     // TODO: here - create update sql & run to change this workout session template to inactive
     if(b_legitWorkoutSession){
-
+      
     }
 
     // ELSE - No legit workout session -> delete all workout_session_items associated with this latest workout_session
