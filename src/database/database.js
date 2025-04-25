@@ -76,11 +76,44 @@ export const fetchWorkoutSessions = async ({setWorkoutSessions}) => {
    };
 
 
-  // THIS FUNCTION MUST - determine if the workout_session_template has any valid workout sessions - probably could use a function for this - has_valid_workout_sessions
+  // THIS FUNCTION MUST - determine if the - probably could use a function for this - 
   // IF NOT - get the workout_session for this template, delete the workout_session_items for this workout_session, delete the workout_session, finally delete the workout template
   export const deleteWorkoutTemplate = async (id) => {
     const db = await SQLite.openDatabaseAsync('trainer.db');
     await db.execAsync('PRAGMA journal_mode = WAL');
+    // get latests workout_session for this template.  
+    const latestWorkoutsSession = await db.getFirstAsync(
+      'SELECT * from workout_sessions where workout_session_template_id  = "' + id + '" \
+      ORDER BY timestamp DESC LIMIT 1;');
+      console.log('latestWorkoutsSession');
+      console.log(latestWorkoutsSession);
+      const workoutSessionId = latestWorkoutsSession.id;
+    // get workout session items for the latest workout_session -
+    const workoutSessionItems = latestWorkoutsSession ? await db.getAllAsync('\
+      SELECT wsi.*, w.* FROM workout_session_items as wsi \
+      join workouts as w on wsi.workout_id=w.id \
+      where wsi.workout_session_id = "' + workoutSessionId + '";') : [];
+    console.log('workoutSessionItems');
+    console.log(workoutSessionItems);
+    // IF/ELSE - are these legit workout_session_items signifying a workout has taken place?  (is done set to a value greater than 0 for all related workout_session_items)
+    let b_legitWorkoutSession = true;
+    b_legitWorkoutSession = (!workoutSessionItems || workoutSessionItems.length == 0) ? false : b_legitWorkoutSession;
+    for(var x = 0; x < workoutSessionItems.length; x++){
+      if(!workoutSessionItems[x].done > 0){
+        b_legitWorkoutSession = false;
+      }
+    }
+    // IF - Is legit workout session -> simply set workout_session_template.id to inactive
+    // TODO: here - create update sql & run to change this workout session template to inactive
+    if(b_legitWorkoutSession){
+
+    }
+
+    // ELSE - No legit workout session -> delete all workout_session_items associated with this latest workout_session
+    
+      // DELETE the workout_session
+
+      // DELETE the workout_session_template
      await db.withTransactionAsync(async () => {
        await db.runAsync(`DELETE FROM workout_session_templates WHERE id = ?`, id);
      });
@@ -110,8 +143,6 @@ export const getWorkoutTemplates = async({setWorkoutTemplates}) => {
         'SELECT * from workout_sessions where workout_session_template_id  = "' + templateId + '" \
         ORDER BY timestamp DESC LIMIT 1;');
       
-        console.log('latestWorkoutsSession');
-        console.log(latestWorkoutsSession);
       workoutTemplates[x].latestWorkoutSession = latestWorkoutsSession;
       const workoutSessionId = latestWorkoutsSession.id;
 

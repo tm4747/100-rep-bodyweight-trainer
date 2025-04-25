@@ -35,7 +35,7 @@ const WorkoutSessionTemplate = ({ template }) => {
   const confirmDeleteWorkoutTemplate = (id) => {
     Alert.alert(
       "Confirm Delete",
-      "Are you sure you want to delete this workout?",
+      "Are you sure you want to delete this workout template? \n\nAny related workout session data will be preserved.",
       [
         {
           text: "Cancel",
